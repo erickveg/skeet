@@ -10,11 +10,6 @@
 #pragma once
 
 #include "observer.h"
-#include "position.h"
-#include "bird.h"
-#include "bullet.h"
-#include "effect.h"
-#include "points.h"
 
 class MobileStorage
 {
