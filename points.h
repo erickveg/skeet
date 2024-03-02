@@ -7,25 +7,42 @@
  *    Inert point values on the screen.
  ************************************************************************/
 
-
 #pragma once
 
 #include "position.h"
+#include "mobileStorage.h"
+#include "mobileInterface.h"
 
  /*********************************************
-  * POINTS
+  * POINTS STORAGE
   * Points graphic drawn on the screen
   *********************************************/
-class Points
+class PointsStorage: public MobileStorage
 {
 public:
-   Points(const Position& pt, int value);
-   void show() const;
-   void update();
+   PointsStorage(const Position& pt, int value): MobileStorage() {};
    bool isDead() const {return age <= 0.0; }
+   
+   // needed b/c PointStorage has additional data
+   ~PointsStorage() override {
+	   MobileStorage::~MobileStorage();
+   }
 private:
    Position pt;
    Velocity v;
    int value;
    float age;
+};
+
+/*********************************************
+ * POINTS INTERFACE
+ * Points graphic drawn on the screen
+ *********************************************/
+class PointsInterface: public MobileInterface
+{
+public:
+  PointsInterface(): MobileInterface() {};
+  void draw(MobileStorage* points) override {};
+  void update(int message) override {};
+
 };

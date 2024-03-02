@@ -9,96 +9,40 @@
 
 #pragma once
 #include "position.h"
+#include "mobileStorage.h"
+#include "mobileInterface.h"
 
 /**********************
  * Effect: stuff that is not interactive
  **********************/
-class Effect
+class EffectStorage : public MobileStorage
 {
 protected:
     Position pt;      // location of the effect
     double age;    // 1.0 = new, 0.0 = dead
 public:
     // create a fragment based on the velocity and position of the bullet
-    Effect(const Position & pt) : pt(pt), age(0.5) {}
-    
-    // draw it
-    virtual void render() const = 0;
-    
-    // move it forward with regards to inertia. Let it age
-    virtual void fly() = 0;
+    EffectStorage(const Position & pt) : MobileStorage(), pt(pt), age(0.5) {}
     
     // it is dead when age goes to 0.0
     bool isDead() const { return age <= 0.0; }
-};
-
-/**********************
- * FRAGMENT
- * Pieces that fly off a dead bird
- **********************/
-class Fragment : public Effect
-{
-private:
-   Velocity v;    // direction the fragment is flying
-   double size;   // size of the fragment
-public:
-    // create a fragment based on the velocity and position of the bullet
-    Fragment(const Position & pt, const Velocity & v);
-    
-    // draw it
-    void render() const;
-    
-    // move it forward with regards to inertia. Let it age
-    void fly();
-};
-
-/**********************
- * STREEK
- * Stuff that trails off the back of shrapnel
- **********************/
-class Streek : public Effect
-{
-private:
-   Position ptEnd;
-public:
-    // create a fragment based on the velocity and position of the bullet
-    Streek(const Position & pt, Velocity v);
-    
-    // draw it
-    void render() const;
-    
-    // move it forward with regards to inertia. Let it age
-    void fly();
-};
-
-/**********************
- * EXHAUST
- * Stuff that comes out the back of a missile when in flight
- **********************/
-class Exhaust : public Effect
-{
-private:
-   Position ptEnd;
-public:
-    // create a fragment based on the velocity and position of the bullet
-    Exhaust(const Position & pt, Velocity v);
-    
-    // draw it
-    void render() const;
-    
-    // move it forward with regards to inertia. Let it age
-    void fly();
+	
+	// needed b/c EffectStorage has additional data
+	~EffectStorage() override {
+		MobileStorage::~MobileStorage();
+	}
 };
 
 /*********************************************
  * EFFECT INTERFACE
  * The base class for drawing effects.
  *********************************************/
-class EffectInterface
+class EffectInterface : public MobileInterface
 {
 public:
-   void const render(/*EffectStorage* effect*/) {};
-   void update(int message) {};
+	EffectInterface() : MobileInterface() {}
+	void draw(MobileStorage* effect) override {};
+	void update(int message) override {};
 };
 
 /*********************************************
@@ -108,7 +52,9 @@ public:
 class FragmentInterface : public EffectInterface
 {
 public:
-   void render(/*EffectStorage* effect*/) {};
+	FragmentInterface() : EffectInterface() {}
+	void draw(MobileStorage* effect) override {};
+	void update(int message) override {};
 };
  
 /*********************************************
@@ -118,7 +64,9 @@ public:
 class StreekInterface : public EffectInterface
 {
 public:
-   void render(/*EffectStorage* effect*/) {};
+	StreekInterface() : EffectInterface() {}
+	void draw(MobileStorage* effect) override {};
+	void update(int message) override {};
 };
  
 /*********************************************
@@ -128,5 +76,87 @@ public:
 class ExhaustInterface : public EffectInterface
 {
 public:
-   void render(/*EffectStorage* effect*/) {};
+	ExhaustInterface() : EffectInterface() {}
+	void draw(MobileStorage* effect) override {};
+	void update(int message) override {};
 };
+
+/*********************************************
+ * EFFECT LOGIC
+ * Handles all effect-related algorithms.
+ *********************************************/
+
+/*********************************************
+ * FRAGMENT LOGIC
+ * Moves Fragments
+ * *********************************************/
+
+/*********************************************
+ * STREEK LOGIC
+ * Moves Streeks
+ *********************************************/
+
+/*********************************************
+ * EXHAUST LOGIC
+ * Moves Exhaust
+ *********************************************/
+
+
+/**********************
+ * FRAGMENT
+ * Pieces that fly off a dead bird
+ **********************/
+/*class Fragment : public Effect
+{
+private:
+   Velocity v;    // direction the fragment is flying
+   double size;   // size of the fragment
+public:
+	// create a fragment based on the velocity and position of the bullet
+	Fragment(const Position & pt, const Velocity & v);
+	
+	// draw it
+	void render() const;
+	
+	// move it forward with regards to inertia. Let it age
+	void fly();
+};*/
+
+/**********************
+ * STREEK
+ * Stuff that trails off the back of shrapnel
+ **********************/
+/*class Streek : public Effect
+{
+private:
+   Position ptEnd;
+public:
+	// create a fragment based on the velocity and position of the bullet
+	Streek(const Position & pt, Velocity v);
+	
+	// draw it
+	void render() const;
+	
+	// move it forward with regards to inertia. Let it age
+	void fly();
+};*/
+
+/**********************
+ * EXHAUST
+ * Stuff that comes out the back of a missile when in flight
+ **********************/
+/*class Exhaust : public Effect
+{
+private:
+   Position ptEnd;
+public:
+	// create a fragment based on the velocity and position of the bullet
+	Exhaust(const Position & pt, Velocity v);
+	
+	// draw it
+	void render() const;
+	
+	// move it forward with regards to inertia. Let it age
+	void fly();
+};*/
+
