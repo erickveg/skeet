@@ -1,31 +1,32 @@
 /***********************************************************************
  * Header File:
- *    Bird : Everything that can be shot
+ *    BirdStorage : Everything that can be shot
  * Author:
- *    Br. Helfrich
+ *    Team 2
  * Summary:
  *    Stuff that moves across the screen to be shot
  ************************************************************************/
 
 #pragma once
 #include "position.h"
+#include "mobileStorage.h"
+#include "mobileInterface.h"
 
 /**********************
- * BIRD
+ * BIRD STORAGE
  * Everything that can be shot
  **********************/
-class Bird
+class BirdStorage : public MobileStorage
 {
-protected:
-   static Position dimensions; // size of the screen
-   Position pt;                  // position of the flyer
+private:
+   Position pt;               // position of the flyer
    Velocity v;                // velocity of the flyer
    double radius;             // the size (radius) of the flyer
    bool dead;                 // is this flyer dead?
    int points;                // how many points is this worth?
    
 public:
-   Bird() : dead(false), points(0), radius(1.0) { }
+	BirdStorage() : MobileStorage(), dead(false), points(0), radius(1.0) { }
    
    // setters
    void operator=(const Position    & rhs) { pt = rhs;    }
@@ -35,78 +36,28 @@ public:
 
    // getters
    bool isDead()           const { return dead;   }
-   Position getPosition()     const { return pt;     }
+   Position getPosition()  const { return pt;     }
    Velocity getVelocity()  const { return v;      }
    double getRadius()      const { return radius; }
    int getPoints() const { return points; }
-   bool isOutOfBounds() const
-   {
-      return (pt.getX() < -radius || pt.getX() >= dimensions.getX() + radius ||
-              pt.getY() < -radius || pt.getY() >= dimensions.getY() + radius);
-   }
+	
+	// needed b/c BirdStorage has additional data
+	~BirdStorage() override {
+		MobileStorage::~MobileStorage();
+	}
 
-   // special functions
-   virtual void draw() = 0;
-   virtual void advance() = 0;
-};
-
-/*********************************************
- * STANDARD
- * A standard bird: slows down, flies in a straight line
- *********************************************/
-class Standard : public Bird
-{
-public:
-    Standard(double radius = 25.0, double speed = 5.0, int points = 10);
-    void draw();
-    void advance();
-};
-
-/*********************************************
- * FLOATER
- * A bird that floats like a balloon: flies up and really slows down
- *********************************************/
-class Floater : public Bird
-{
-public:
-    Floater(double radius = 30.0, double speed = 5.0, int points = 15);
-    void draw();
-    void advance();
-};
-
-/*********************************************
- * CRAZY
- * A crazy flying object: randomly changes direction
- *********************************************/
-class Crazy : public Bird
-{
-public:
-    Crazy(double radius = 30.0, double speed = 4.5, int points = 30);
-    void draw();
-    void advance();
-};
-
-/*********************************************
- * SINKER
- * A sinker bird: honors gravity
- *********************************************/
-class Sinker : public Bird
-{
-public:
-    Sinker(double radius = 30.0, double speed = 4.5, int points = 20);
-    void draw();
-    void advance();
 };
 
 /*********************************************
  * BIRD INTERFACE
  * The base class for drawing birds.
  *********************************************/
-class BirdInterface
+class BirdInterface: public MobileInterface
 {
 public:
-   void draw(/*BirdStorage* bird*/) {};
-   void update(int message) {};
+	BirdInterface() : MobileInterface() {}
+	void draw(MobileStorage* bird) override {};
+	void update(int message) override {};
 };
  
 /*********************************************
@@ -116,7 +67,9 @@ public:
 class StandardInterface : public BirdInterface
 {
 public:
-   void draw(/*BirdStorage* bird*/) {};
+	StandardInterface() : BirdInterface() {}
+	void draw(MobileStorage* bird) override {};
+	void update(int message) override {};
 };
 
  /*********************************************
@@ -126,7 +79,9 @@ public:
 class FloaterInterface : public BirdInterface
 {
 public:
-   void draw(/*BirdStorage* bird*/) {};
+	FloaterInterface() : BirdInterface() {}
+	void draw(MobileStorage* bird) override {};
+	void update(int message) override {};
 };
  
 /*********************************************
@@ -136,7 +91,9 @@ public:
 class CrazyInterface : public BirdInterface
 {
 public:
-   void draw(/*BirdStorage* bird*/) {};
+	CrazyInterface() : BirdInterface() {}
+	void draw(MobileStorage* bird) override {};
+	void update(int message) override {};
 };
  
 /*********************************************
@@ -146,5 +103,33 @@ public:
 class SinkerInterface : public BirdInterface
 {
 public:
-   void draw(/*BirdStorage* bird*/) {};
+	SinkerInterface() : BirdInterface() {}
+	void draw(MobileStorage* bird) override {};
+	void update(int message) override {};
 };
+
+/*********************************************
+ * BIRD LOGIC
+ * Handles all bird-related algorithms.
+ *********************************************/
+
+/*********************************************
+ * STANDARD LOGIC
+ * Moves Standard birds.
+ *********************************************/
+
+/*********************************************
+ * SINKER LOGIC
+ * Moves Sinker birds.
+ *********************************************/
+
+/*********************************************
+ * CRAZY LOGIC
+ * Moves Crazy birds.
+ *********************************************/
+
+/*********************************************
+ * FLOATER LOGIC
+ * Moves Floater birds.
+ *********************************************/
+
