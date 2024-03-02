@@ -42,17 +42,17 @@ using namespace std;
 void GameInterface::drawLevel() const
 {
     // output the background
-    drawBackground(time.level() * .1, 0.0, 0.0);
+    drawBackground(storage.getTime().level() * .1, 0.0, 0.0);
 
     // draw the bullseye
-    if (bullseye)
-        drawBullseye(gun.getAngle());
+    if (storage.getBullseye())
+        drawBullseye(storage.getGun().getAngle());
 
     // output the gun
-    gun.display();
+    gunInterface().display();
 
     // output the birds, bullets, and fragments
-    for (auto& pts : points)
+    for (auto& pts : storage.getPoints())
         pts.show();
     for (auto effect : effects)
         effect->render();
@@ -237,7 +237,7 @@ void drawText(const Position& topLeft, const string& text)
  * DRAW BULLSEYE
  * Put a bullseye on the screen
  ************************/
-void Skeet::drawBullseye(double angle) const
+void GameInterface::drawBullseye(double angle) const
 {
     // find where we are pointing
     double distance = dimensions.getX();
