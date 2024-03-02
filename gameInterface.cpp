@@ -36,17 +36,62 @@ using namespace std;
 #endif // _WIN32
 
 /************************
+ * SKEET INTERACT
+ * handle all user input
+ ************************/
+void GameInterface::interact(const UserInput& ui)
+{
+    Time time = storage.getTime();
+    Score score = storage.Score();
+    HitRadio hitRadio = storage.getHiRatio();
+    Gun gun = storage.getGun();
+    bool bullseye = storage.getBullseye();
+    std::list<Bullet*> bullets;   
+
+    // reset the game
+    if (time.isGameOver() && ui.isSpace())
+    {
+        time.reset();
+        score.reset();
+        hitRatio.reset();
+        return;
+    }
+
+    // gather input from the interface
+    gun.interact(ui.isUp() + ui.isRight(), ui.isDown() + ui.isLeft());
+    Bullet* p = logic.setBullet(ui);
+
+    bullseye = logic.setBullseye(ui);
+
+    // add something if something has been added
+    if (nullptr != p)
+        storage.getBullets().push_back(p);
+
+    // send movement information to all the bullets. Only the missile cares.
+    for (auto bullet : bullets)
+        BulletType bulletType = bullet.getType()
+        logic.bulletLogics[bulletType].input(ui.isUp() + ui.isRight(), ui.isDown() + ui.isLeft(), ui.isB());
+}
+
+/************************
 * SKEET DRAW LEVEL
 * output everything that will be on the screen
 ************************/
 void GameInterface::drawLevel() const
 {
+    bool bullseye = storage.getBullseye();
+    Time time = storage.getTime();
+    Gun gun = storage.getGun();
+    Position dimensions = storage.getDimensions();
+    Score score = storage.getScore();
+    HitRadio hitRadio = storage.getHitRadio();    
+
     // output the background
-    drawBackground(storage.getTime().level() * .1, 0.0, 0.0);
+    drawBackground(time.level() * .1, 0.0, 0.0);
 
     // draw the bullseye
-    if (storage.getBullseye())
-        drawBullseye(storage.getGun().getAngle());
+    if (bullseye)
+        drawBullseye(gun.getAngle());
 
     // output the gun
     gunInterface().display();
@@ -55,19 +100,19 @@ void GameInterface::drawLevel() const
     for (auto& pts : storage.getPoints())
         pts.show();
 
-    for (auto effect : storage.getEffects()
+    for (auto effect : storage.getEffects())
     {
         EffectType effectType = effect.getType();
         effectInterfaces[effectType].draw();
     }
 
-    for (auto bullet : bullets)
+    for (auto bullet : storage.getBullets())
     {
         EffectType effectType = bullet.getType();
         bulletInterfaces[effectType].draw();
     }
 
-    for (auto bird : birds)
+    for (auto bird : storage.getBirds())
     {
         EffectType effectType = bird.getType();
         birdInterfaces[effectType].draw();
@@ -85,6 +130,10 @@ void GameInterface::drawLevel() const
  ************************/
 void GameInterface::drawStatus() const
 {
+    Time time = storage.getTime();
+    Position dimensions = storage.getDimensions();
+    Score score = storage.getScore();
+
     // output the text information
     ostringstream sout;
     if (time.isGameOver())
@@ -119,6 +168,8 @@ void GameInterface::drawStatus() const
  *************************************************************************/
 void GameInterface::drawBackground(double redBack, double greenBack, double blueBack) const
 {
+    Position dimensions = storage.getDimensions();
+
     glBegin(GL_TRIANGLE_FAN);
 
     // two rectangles is the fastest way to fill the screen.
@@ -142,6 +193,8 @@ void GameInterface::drawTimer(double percent,
     double redFore, double greenFore, double blueFore,
     double redBack, double greenBack, double blueBack) const
 {
+    Position dimensions = storage.getDimensions();
+
     double radians;
 
     GLfloat length = (GLfloat)dimensions.getX();
@@ -251,6 +304,8 @@ void drawText(const Position& topLeft, const string& text)
  ************************/
 void GameInterface::drawBullseye(double angle) const
 {
+    Position dimensions = storage.getDimensions();
+
     // find where we are pointing
     double distance = dimensions.getX();
     GLfloat x = dimensions.getX() - distance * cos(angle);

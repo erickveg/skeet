@@ -21,7 +21,7 @@ public:
 	void initialize(GameLogic &gameLogic);
     std::map <BirdType, BirdInterface*> birdInterfaces;
     std::map <EffectType, EffectInterface*> effectInterfaces;
-    std::map <EffectType, EffectInterface*> effectInterfaces;
+    std::map <BulletType, BulletInterface*> bulletInterfaces;
     GunInterface gunInterface;
  
     void interact(const UserInput& ui);
