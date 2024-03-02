@@ -10,17 +10,18 @@
 #pragma once
 #include "position.h"
 #include "effect.h"
+#include "mobileStorage.h"
+#include "mobileInterface.h"
 #include <list>
 #include <cassert>
 
 /*********************************************
- * BULLET
+ * BULLET STORAGE
  * Something to shoot something else
  *********************************************/
-class Bullet
+class BulletStorage : public MobileStorage
 {
 protected:
-   static Position dimensions;   // size of the screen
    Position pt;                  // position of the bullet
    Velocity v;                // velocity of the bullet
    double radius;             // the size (radius) of the bullet
@@ -28,7 +29,7 @@ protected:
    int value;                 // how many points does this cost?
     
 public:
-   Bullet(double angle = 0.0, double speed = 30.0, double radius = 5.0, int value = 1);
+   BulletStorage() : MobileStorage(), dead(false), value(0), radius(1.0) { }
    
    // setters
    void kill()                   { dead = true; }
@@ -41,44 +42,122 @@ public:
    double getRadius()      const { return radius; }
    int getValue()          const { return value;  }
 
-   // special functions
+   // still unsure about this method...I think it belongs in Storage,
+   // but it would need to be overridden, and there are no child classes
    virtual void death(std::list<Bullet *> & bullets) {}
-   virtual void output() = 0;
-   virtual void input(bool isUp, bool isDown, bool isB) {}
-   virtual void move(std::list<Effect*> &effects);
 
-protected:
-   bool isOutOfBounds() const
-   {
-      return (pt.getX() < -radius || pt.getX() >= dimensions.getX() + radius ||
-         pt.getY() < -radius || pt.getY() >= dimensions.getY() + radius);
+   // needed b/c BulletStorage has additional data
+   ~BulletStorage() override {
+	MobileStorage::~MobileStorage();
    }
-   void drawLine(const Position& begin, const Position& end,
-                 double red = 1.0, double green = 1.0, double blue = 1.0) const;
 
-   void drawDot(const Position& point, double radius = 2.0,
-                double red = 1.0, double green = 1.0, double blue = 1.0) const;
-   int    random(int    min, int    max);
-   double random(double min, double max);
 };
+/*********************************************
+ * BULLET INTERFACE
+ * The base class for drawing bullets and handling
+ * user input.
+ *********************************************/
+class BulletInterface: public MobileInterface
+{
+public:
+	BulletInterface(): MobileInterface() {};
+	void input(bool isUp, bool isDown, bool isB) {};
+	void draw(MobileStorage* bullet) override {};
+	void update(int message) override {};
+	
+protected:
+	void const drawLine(Position begin, Position end, double red,
+		double green, double blue) {};
+	void drawDot(Position point, double radius) {};
+};
+ 
+/*********************************************
+ * MISSILE INTERFACE
+ * Draws Missile bullets and handles user input.
+ *********************************************/
+class MissileInterface : public BulletInterface
+{
+public:
+	void draw(MobileStorage* bullet) override {};
+	void update(int message) override {};
+	void input(bool isUp, bool isDown, bool isB) {};
+};
+
+/*********************************************
+ * SHRAPNEL INTERFACE
+ * Draws Shrapnel Bullets
+ *********************************************/
+class ShrapnelInterface : public BulletInterface
+{
+public:
+	void draw(MobileStorage* bullet) override {};
+	void update(int message) override {};
+};
+ 
+/*********************************************
+ * PELLET INTERFACE
+ * Draws Pellet bullets.
+ *********************************************/
+class PelletInterface : public BulletInterface
+{
+public:
+	void draw(MobileStorage* bullet) override {};
+	void update(int message) override {};
+};
+ 
+/*********************************************
+ * BOMB INTERFACE
+ * Draws Bomb bullets.
+ *********************************************/
+class BombInterface : public BulletInterface
+{
+public:
+	void draw(MobileStorage* bullet) override {};
+	void update(int message) override {};
+};
+ 
+/*********************************************
+ * BULLET LOGIC
+ * Handles all bullet-related algorithms.
+ *********************************************/
+
+/*********************************************
+ * MISSILE LOGIC
+ * Moves Missiles
+ * *********************************************/
+
+/*********************************************
+ * SHRAPNEL LOGIC
+ * Moves Shrapnel
+ *********************************************/
+
+/*********************************************
+ * PELLET LOGIC
+ * Moves Pellets
+ *********************************************/
+
+/*********************************************
+ * BOMB LOGIC
+ * Moves Bombs
+ *********************************************/
 
 /*********************
  * PELLET
  * Small little bullet
  **********************/
-class Pellet : public Bullet
+/*class Pellet : public Bullet
 {
 public:
    Pellet(double angle, double speed = 15.0) : Bullet(angle, speed, 1.0, 1) {}
    
    void output();
-};
+};*/
 
 /*********************
  * BOMB
  * Things that go "boom"
  **********************/
-class Bomb : public Bullet
+/*class Bomb : public Bullet
 {
 private:
    int timeToDie;
@@ -88,13 +167,13 @@ public:
    void output();
    void move(std::list<Effect*> & effects);
    void death(std::list<Bullet *> & bullets);
-};
+};*/
 
 /*********************
  * Shrapnel
  * A piece that broke off of a bomb
  **********************/
-class Shrapnel : public Bullet
+/*class Shrapnel : public Bullet
 {
 private:
    int timeToDie;
@@ -115,14 +194,14 @@ public:
    
    void output();  
    void move(std::list<Effect*> & effects);
-};
+};*/
 
 
 /*********************
  * MISSILE
  * Guided missiles
  **********************/
-class Missile : public Bullet
+/*class Missile : public Bullet
 {
 public:
    Missile(double angle, double speed = 10.0) : Bullet(angle, speed, 1.0, 3) {}
@@ -136,64 +215,5 @@ public:
          v.turn(-0.04);
    }
    void move(std::list<Effect*> & effects);
-};
-
-/*********************************************
- * BULLET INTERFACE
- * The base class for drawing bullets and handling
- * user input.
- *********************************************/
-class BulletInterface
-{
-public:
-	void input(bool isUp, bool isDown, bool isB) {};
-	void draw(/*BulletStorage* bullet*/) {};
-	void update(int message) {};
- 
-protected:
-	void const drawLine(Position begin, Position end, double red,
-		double green, double blue) {};
-	void drawDot(Position point, double radius) {};
-};
- 
-/*********************************************
- * MISSILE INTERFACE
- * Draws Missile bullets and handles user input.
- *********************************************/
-class MissileInterface : public BulletInterface
-{
-public:
-	void draw(/*BulletStorage* bullet*/) {};
-	void input(bool isUp, bool isDown, bool isB) {};
-};
-
-/*********************************************
- * SHRAPNEL INTERFACE
- * Draws Shrapnel Bullets
- *********************************************/
-class ShrapnelInterface : public BulletInterface
-{
-public:
-	void draw(/*BulletStorage* bullet*/) {};
-};
- 
-/*********************************************
- * PELLET INTERFACE
- * Draws Pellet bullets.
- *********************************************/
-class PelletInterface : public BulletInterface
-{
-public:
-	void draw(/*BulletStorage* bullet*/) {};
-};
- 
-/*********************************************
- * BOMB INTERFACE
- * Draws Bomb bullets.
- *********************************************/
-class BombInterface : public BulletInterface
-{
-public:
-	void draw(/*BulletStorage* bullet*/) {};
-};
+};*/
  
