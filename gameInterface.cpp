@@ -54,12 +54,24 @@ void GameInterface::drawLevel() const
     // output the birds, bullets, and fragments
     for (auto& pts : storage.getPoints())
         pts.show();
-    for (auto effect : effects)
-        effect->render();
+
+    for (auto effect : storage.getEffects()
+    {
+        EffectType effectType = effect.getType();
+        effectInterfaces[effectType].draw();
+    }
+
     for (auto bullet : bullets)
-        bullet->output();
-    for (auto element : birds)
-        element->draw();
+    {
+        EffectType effectType = bullet.getType();
+        bulletInterfaces[effectType].draw();
+    }
+
+    for (auto bird : birds)
+    {
+        EffectType effectType = bird.getType();
+        birdInterfaces[effectType].draw();
+    }
 
     // status
     drawText(Position(10, dimensions.getY() - 30), score.getText());

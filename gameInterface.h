@@ -11,6 +11,7 @@
 
 #include "uiInteract.h"
 #include "gameLogic.h"
+#include "gameStorage.h"
  
 class GameInterface
 {
@@ -18,16 +19,18 @@ class GameInterface
 public:
 	GameInterface();
 	void initialize(GameLogic &gameLogic);
-	BirdInterface birdInterface;
-    BulletInterface bulletInterface;
-    EffectInterface effectInterface;
+    std::map <BirdType, BirdInterface*> birdInterfaces;
+    std::map <EffectType, EffectInterface*> effectInterfaces;
+    std::map <EffectType, EffectInterface*> effectInterfaces;
+    GunInterface gunInterface;
  
     void interact(const UserInput& ui);
     void drawLevel() const;
     void drawStatus() const;
  
 private:
-	GameLogic logic;
+	GameLogic &logic;
+    GameStorage &storage;
 	
     void drawBackground(double redBack, double greenBack, double blueBack) const;
     void drawTimer(
@@ -38,4 +41,5 @@ private:
         double redBack,
         double greenBack,
         double blueBack) const;
+    void drawBullseye(double angle) const;
 };

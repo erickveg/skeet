@@ -25,6 +25,10 @@ class GameStorage
 public:
 	GameStorage() : gun(Position(800.0, 0.0)), time(), score(), hitRatio(), bullseye(false) {}
 	void initialize(GameInterface &gameViews);
+	Time getTime() { return time; }
+	bool getBullseye() { return bullseye;}
+	Gun getGun() { return gun; }
+
 private:
 	std::list<GameInterface> views;
 	std::list<MobileStorage*> elements;

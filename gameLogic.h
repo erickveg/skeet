@@ -28,13 +28,8 @@ public:
 	bool detectColiisions();
 
 	std::map <BirdType, BirdLogic*> birdLogics;
-	std::map <BirdType, BirdInterface*> birdInterfaces;
-
 	std::map <EffectType, EffectLogic*> effectLogic;
-	std::map <EffectType, EffectInterface*> effectInterfaces;
-
 	std::map <BulletType, BulletLogic*> bulletLogic;
-	std::map <BulletType, BulletInterface*> bulletInterfaces;
  
 private:
 	double minimumDistance(Position pt1, Velocity v1, Position pt2, Velocity v2);
